@@ -1,70 +1,73 @@
-# Getting Started with Create React App
+# 🤖 Gemini Chatbot with ReactJS + Flask
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Một chatbot AI thông minh sử dụng **Google Gemini 2.0 Flash API**, được xây dựng bằng **ReactJS (frontend)** và **Flask (backend)**.  
+Dự án này cho phép người dùng gửi tin nhắn hoặc hình ảnh để AI trả lời hoặc mô tả trực tiếp.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🌟 Tính năng nổi bật
 
-### `npm start`
+- 💬 Chat thời gian thực với mô hình **Gemini 2.0 Flash** của Google  
+- 🖼️ Gửi ảnh và xem **thumbnail preview** trực tiếp trong hộp chat  
+- 🧠 Xử lý đa phương tiện (text + image) với phản hồi nhanh  
+- 🧩 Kết nối React ↔ Flask thông qua REST API  
+- 🔒 Bảo mật API key bằng `.env`  
+- ⚡ Cấu trúc tách biệt frontend/backend dễ mở rộng và triển khai  
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## 🗂️ Cấu trúc dự án
+```
+Gemini_ChatBot_With_ReactJS/
+│
+├── backend/                 # Flask API server
+│   ├── app.py               # Flask main app (AI API logic)
+│   ├── requirements.txt     # Các thư viện Python cần thiết
+│   └── .env                 # (ẩn) Chứa GEMINI_API_KEY
+│
+├── frontend/                # ReactJS UI
+│   ├── src/
+│   │   ├── App.js
+│   │   └── components/
+│   │       └── ChatBox.js
+│   ├── package.json
+│   └── vite.config.js
+│
+├── .gitignore
+└── README.md
+```
+## ⚙️ Cài đặt & chạy dự án
 
-### `npm test`
+### 🔹 1. Backend (Flask)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+**Tạo môi trường ảo & cài dependencies**
+```
+cd backend
+python -m venv .venv
+source .venv/bin/activate      # macOS/Linux
+.venv\Scripts\activate         # Windows
+pip install -r requirements.txt
+```
+**Tạo file .env trong thư mục backend**
+```
+GEMINI_API_KEY=YOUR_GEMINI_API_KEY
+```
 
-### `npm run build`
+**Chạy server flask**
+```
+python app.py
+```
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+### 🔹 2. Frontend (ReactJS)
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+**Cài đặt dependencies**
+```
+cd frontend
+npm install
+```
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+**Chạy development server**
+```
+npm run dev
+```
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
