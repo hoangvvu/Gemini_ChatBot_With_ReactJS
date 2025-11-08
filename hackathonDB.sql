@@ -66,7 +66,7 @@ VALUES
 (N'Phố Cổ Hội An', N'Hội An, Việt Nam', 15.8801, 108.3380, N'Phố cổ Hội An, Di sản Thế giới UNESCO'),
 (N'Kinh thành Huế', N'Thừa Thiên Huế, Việt Nam', 16.4695, 107.5790, N'Di tích cố đô với Hoàng thành, lăng tẩm triều Nguyễn.'),
 (N'Hang Sơn Đoòng', N'Quảng Bình, Việt Nam', 17.4560, 106.2870, N'Hệ thống hang động kỳ vĩ thuộc Vườn quốc gia Phong Nha - Kẻ Bàng.'),
-(N'Chợ nổi Cái Răng', N'Cần Thơ, Việt Nam', 9.9997, 105.7520, N'Chợ nổi đặc trưng sông nước miền Tây.'),
+(N'Chợ nổi Cái Răng', N'Cần Thơ, Việt Nam', 9.9997, 105.7520, N'Chợ nổi đặc trưng sông nước miền Tây.');
 
 
 

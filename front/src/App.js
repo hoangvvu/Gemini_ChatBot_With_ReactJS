@@ -8,6 +8,11 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
+// *** CẬP NHẬT: Import file ExplorePage mới ***
+import ExplorePage from '../src/components/ExplorePage'; 
+// *******************************************
+
+
 // *** Sửa lỗi icon marker mặc định của Leaflet ***
 import iconUrl from 'leaflet/dist/images/marker-icon.png';
 import iconShadowUrl from 'leaflet/dist/images/marker-shadow.png';
@@ -74,16 +79,17 @@ const NavBar = ({ setCurrentPage, setMobileMenuOpen, mobileMenuOpen, setSelected
 };
 
 // Home Page
-// *** CẬP NHẬT: Thêm 'setSelectedPlaceId' và sửa 'handleSmartSearch' để gọi API DB ***
+// *** CẬP NHẬT: GỌI API /api/ai-search ***
 const HomePage = ({ setCurrentPage, setSelectedPlaceId }) => {
   const [searchInput, setSearchInput] = useState('');
   const [weather, setWeather] = useState(null);
-  const [recommendations, setRecommendations] = useState([]); // Sẽ chứa kết quả từ DB
+  const [recommendations, setRecommendations] = useState([]); 
   const [loading, setLoading] = useState(false);
   
+  // Bạn nên chuyển key này vào file .env.local và dùng process.env.REACT_APP_WEATHER_API_KEY
   const WEATHER_API_KEY = 'bdb6cd644053354271d07e32ba89b83'; 
 
-  // Lấy vị trí và thời tiết hiện tại (Giữ nguyên)
+  // Lấy vị trí và thời tiết hiện tại
   useEffect(() => {
     getCurrentLocationWeather();
   }, []);
@@ -112,7 +118,7 @@ const HomePage = ({ setCurrentPage, setSelectedPlaceId }) => {
     }
   };
 
-  // *** THAY ĐỔI: Tìm kiếm địa điểm từ Database (Backend Flask) ***
+  // *** 🛑 THAY ĐỔI: Tìm kiếm bằng AI (Backend Flask) 🛑 ***
   const handleSmartSearch = async () => {
     const query = searchInput.trim();
     if (!query) {
@@ -124,24 +130,23 @@ const HomePage = ({ setCurrentPage, setSelectedPlaceId }) => {
     setRecommendations([]); // Xóa kết quả cũ
 
     try {
-      // Gọi API /api/search-places
-      const response = await axios.get('http://127.0.0.1:5000/api/search-places', {
+      // Gọi API /api/ai-search mới
+      const response = await axios.get('http://127.0.0.1:5000/api/ai-search', {
         params: { q: query }
       });
       
-      // Lưu kết quả (đã có id, name, description, thumbnail)
+      // Lưu kết quả
       setRecommendations(response.data || []);
 
     } catch (error) {
-      console.error('Lỗi tìm kiếm địa điểm:', error);
-      // Bạn có thể đặt fallback data ở đây nếu muốn
+      console.error('Lỗi tìm kiếm AI:', error);
       setRecommendations([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // *** THÊM MỚI: Hàm xử lý khi click vào thẻ kết quả ***
+  // Hàm xử lý khi click vào thẻ kết quả
   const handleRecommendationClick = (placeId) => {
     setSelectedPlaceId(placeId);
     setCurrentPage('details'); // Chuyển sang trang chi tiết
@@ -149,7 +154,7 @@ const HomePage = ({ setCurrentPage, setSelectedPlaceId }) => {
 
   return (
     <div className="pt-16">
-      {/* Hero Section (Giữ nguyên) */}
+      {/* Hero Section */}
       <div className="relative h-screen">
         <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/90 to-blue-600/90 z-10"></div>
         <img 
@@ -162,10 +167,10 @@ const HomePage = ({ setCurrentPage, setSelectedPlaceId }) => {
             🌍 Smart Travel Hub
           </h1>
           <p className="text-xl md:text-2xl mb-8 text-center max-w-3xl">
-            Tìm kiếm địa điểm du lịch tại Việt Nam
+            Trợ lý du lịch AI cho Việt Nam
           </p>
           
-          {/* Weather Display (Giữ nguyên) */}
+          {/* Weather Display */}
           {weather && (
             <div className="bg-white/20 backdrop-blur-lg rounded-2xl p-6 mb-8 text-center">
               <div className="flex items-center justify-center gap-4">
@@ -183,13 +188,13 @@ const HomePage = ({ setCurrentPage, setSelectedPlaceId }) => {
             </div>
           )}
 
-          {/* Smart Search - Đã cập nhật */}
+          {/* *** 🛑 THAY ĐỔI: Smart Search AI 🛑 *** */}
           <div className="w-full max-w-3xl">
             <div className="bg-white rounded-full shadow-2xl p-2 flex items-center mb-4">
               <Search className="w-6 h-6 text-gray-400 ml-4" />
               <input
                 type="text"
-                placeholder="Tìm tên địa điểm (VD: Ba Na Hills, Hội An...)"
+                placeholder="Tôi muốn đi biển yên tĩnh và ăn hải sản..." // 👈 THAY ĐỔI
                 className="flex-1 px-4 py-3 text-gray-800 outline-none"
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
@@ -200,15 +205,15 @@ const HomePage = ({ setCurrentPage, setSelectedPlaceId }) => {
                 disabled={loading}
                 className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-3 rounded-full hover:shadow-lg transition disabled:opacity-50"
               >
-                {loading ? '🔍 Đang tìm...' : 'Tìm kiếm'}
+                {loading ? '🤖 AI Đang tìm...' : 'Tìm bằng AI'} 
               </button>
             </div>
             <p className="text-sm text-center text-white/80">
-              💡 Tìm kiếm địa điểm trực tiếp từ cơ sở dữ liệu
+              💡 Trợ lý AI sẽ tìm địa điểm phù hợp với yêu cầu của bạn 
             </p>
           </div>
 
-          {/* *** CẬP NHẬT: Hiển thị kết quả tìm kiếm từ DB *** */}
+          {/* Hiển thị kết quả tìm kiếm từ DB */}
           {recommendations.length > 0 && (
             <div className="w-full max-w-4xl mt-8 grid md:grid-cols-3 gap-4">
               {recommendations.map((rec) => (
@@ -231,7 +236,7 @@ const HomePage = ({ setCurrentPage, setSelectedPlaceId }) => {
       <div className="py-20 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold text-center mb-12 text-gray-800">
-            🧩 Tính năng AI & API
+            🧩 Tính năng
           </h2>
           <div className="grid md:grid-cols-4 gap-6">
             {[
@@ -255,59 +260,47 @@ const HomePage = ({ setCurrentPage, setSelectedPlaceId }) => {
 
 // Tools Page (Giữ nguyên)
 const ToolsPage = () => {
-  // ... (Toàn bộ code của ToolsPage giữ nguyên như file gốc) ...
-  // Currency Converter
+  // ... (Toàn bộ code của ToolsPage giữ nguyên) ...
   const [amount, setAmount] = useState(100);
   const [fromCurrency, setFromCurrency] = useState('USD');
   const [toCurrency, setToCurrency] = useState('VND');
   const [convertedAmount, setConvertedAmount] = useState(0);
   const [rates, setRates] = useState(null);
-
-  // Translation
   const [textToTranslate, setTextToTranslate] = useState('');
   const [translatedText, setTranslatedText] = useState('');
   const [translating, setTranslating] = useState(false);
-
-  // Cost Prediction
   const [destination, setDestination] = useState('');
   const [days, setDays] = useState(3);
   const [people, setPeople] = useState(2);
   const [costPrediction, setCostPrediction] = useState(null);
 
-  // Fetch exchange rates
   useEffect(() => {
     fetchExchangeRates();
   }, []);
 
   const fetchExchangeRates = async () => {
     try {
-      // Sử dụng exchangerate-api.com (free tier)
       const response = await axios.get('https://api.exchangerate-api.com/v4/latest/USD');
       setRates(response.data.rates);
     } catch (error) {
       console.error('Lỗi lấy tỷ giá:', error);
-      // Fallback rates
       setRates({ VND: 24000, EUR: 0.85, GBP: 0.73, USD: 1 });
     }
   };
 
   const handleConvert = () => {
     if (!rates) return;
-    
     if (fromCurrency === toCurrency) {
       setConvertedAmount(amount);
     } else {
-      // Convert through USD
       const inUSD = fromCurrency === 'USD' ? amount : amount / rates[fromCurrency];
       const result = toCurrency === 'USD' ? inUSD : inUSD * rates[toCurrency];
       setConvertedAmount(result);
     }
   };
 
-  // AI Translation
   const handleTranslate = async () => {
     if (!textToTranslate.trim()) return;
-    
     setTranslating(true);
     try {
       const response = await axios.post('http://127.0.0.1:5000/api/chat',
@@ -324,7 +317,6 @@ const ToolsPage = () => {
     }
   };
 
-  // Text-to-Speech
   const handleSpeak = (text, lang) => {
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = lang === 'vi' ? 'vi-VN' : 'en-US';
@@ -332,17 +324,14 @@ const ToolsPage = () => {
     window.speechSynthesis.speak(utterance);
   };
 
-  // AI Cost Prediction
   const handleCostPrediction = async () => {
     if (!destination.trim()) return;
-    
     try {
       const response = await axios.post('http://127.0.0.1:5000/api/chat',
         new URLSearchParams({
           message: `Ước tính chi phí du lịch ${destination} cho ${people} người trong ${days} ngày. Bao gồm: vé máy bay, khách sạn, ăn uống, vé tham quan. Trả về JSON: {"transport": số, "hotel": số, "food": số, "tickets": số, "total": số, "tourPrice": số}. Chỉ trả JSON, không giải thích.`
         })
       );
-      
       const jsonMatch = response.data.reply.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const costs = JSON.parse(jsonMatch[0]);
@@ -356,18 +345,17 @@ const ToolsPage = () => {
   return (
     <div className="pt-24 pb-12 min-h-screen bg-gray-50">
       <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-4 text-gray-800">🛠️ Công cụ AI & API</h1>
-        <p className="text-gray-600 mb-8">Sử dụng API thực tế và AI để hỗ trợ chuyến đi</p>
+        <h1 className="text-4xl font-bold mb-4 text-gray-800">🛠️ Công cụ</h1>
+        <p className="text-gray-600 mb-8">Sử dụng API thực tế và AI hỗ trợ chuyến đi</p>
 
         <div className="grid lg:grid-cols-2 gap-8">
           
-          {/* Currency Converter với API */}
+          {/* Currency Converter */}
           <div className="bg-white rounded-xl shadow-lg p-6">
             <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
               <DollarSign className="w-6 h-6 text-green-500" />
               Đổi tiền tệ (Live API)
             </h2>
-            
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold mb-2">Số tiền</label>
@@ -378,7 +366,6 @@ const ToolsPage = () => {
                   className="w-full px-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500"
                 />
               </div>
-
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-semibold mb-2">Từ</label>
@@ -393,7 +380,6 @@ const ToolsPage = () => {
                     <option value="GBP">GBP 🇬🇧</option>
                   </select>
                 </div>
-
                 <div>
                   <label className="block text-sm font-semibold mb-2">Sang</label>
                   <select
@@ -408,14 +394,12 @@ const ToolsPage = () => {
                   </select>
                 </div>
               </div>
-
               <button
                 onClick={handleConvert}
                 className="w-full bg-green-500 text-white py-3 rounded-lg font-semibold hover:bg-green-600 transition"
               >
                 Quy đổi (Live Rate)
               </button>
-
               {convertedAmount > 0 && (
                 <div className="bg-green-50 border-2 border-green-500 rounded-lg p-4 text-center">
                   <p className="text-sm text-gray-600 mb-1">Kết quả</p>
@@ -434,7 +418,6 @@ const ToolsPage = () => {
               <Languages className="w-6 h-6 text-purple-500" />
               Phiên dịch AI + Lồng tiếng
             </h2>
-            
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-semibold mb-2">Văn bản tiếng Việt</label>
@@ -452,7 +435,6 @@ const ToolsPage = () => {
                   <Play className="w-4 h-4" /> Nghe tiếng Việt
                 </button>
               </div>
-
               <button
                 onClick={handleTranslate}
                 disabled={translating}
@@ -460,7 +442,6 @@ const ToolsPage = () => {
               >
                 {translating ? '🤖 AI đang dịch...' : 'Dịch sang tiếng Anh (AI)'}
               </button>
-
               {translatedText && (
                 <div className="bg-purple-50 border-2 border-purple-500 rounded-lg p-4">
                   <div className="flex justify-between items-start mb-2">
@@ -484,7 +465,6 @@ const ToolsPage = () => {
               <DollarSign className="w-6 h-6 text-blue-500" />
               Dự đoán chi phí du lịch (AI)
             </h2>
-            
             <div className="grid md:grid-cols-3 gap-4 mb-4">
               <div>
                 <label className="block text-sm font-semibold mb-2">Điểm đến</label>
@@ -519,14 +499,12 @@ const ToolsPage = () => {
                 />
               </div>
             </div>
-
             <button
               onClick={handleCostPrediction}
               className="w-full bg-blue-500 text-white py-3 rounded-lg font-semibold hover:bg-blue-600 transition mb-4"
             >
-              🤖 AI dự đoán chi phí
+              Dự đoán chi phí
             </button>
-
             {costPrediction && (
               <div className="grid md:grid-cols-2 gap-4">
                 <div className="space-y-3">
@@ -562,25 +540,27 @@ const ToolsPage = () => {
             )}
           </div>
           
-          {/* Google Maps Direction (GIỮ NGUYÊN) */}
+          {/* Google Maps Direction */}
           <div className="bg-white rounded-xl shadow-lg p-6 lg:col-span-2">
-            <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
-              <Map className="w-6 h-6 text-red-500" />
-              Chỉ đường (Google Maps API)
-            </h2>
-            <div className="bg-gray-100 h-96 rounded-lg flex items-center justify-center">
-              <div className="text-center">
-                <MapPinned className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                <p className="text-gray-600 mb-4">Nhập điểm đến để xem chỉ đường</p>
-                <input
-                  type="text"
-                  placeholder="VD: Vịnh Hạ Long"
-                  className="px-4 py-2 border rounded-lg mb-2"
-                />
-                <button className="block mx-auto bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600">
-                  Chỉ đường
-                </button>
-                <p className="text-xs text-gray-500 mt-2">Tích hợp Google Maps Directions API</p>
+    <h2 className="text-2xl font-bold mb-6 flex items-center gap-2">
+      <Map className="w-6 h-6 text-red-500" />
+      Chỉ đường (Google Maps API)
+    </h2>
+    <div className="bg-gray-100 h-96 rounded-lg flex items-center justify-center">
+      <div className="text-center">
+        <MapPinned className="w-16 h-16 mx-auto mb-4 text-gray-400" />
+        {/* LỖI ĐÃ SỬA: Thay </g> bằng </p> */}
+        <p className="text-gray-600 mb-4">Nhập điểm đến để xem chỉ đường</p> 
+        <input
+          type="text"
+          placeholder="VD: Vịnh Hạ Long"
+          className="px-4 py-2 border rounded-lg mb-2"
+        />
+        {/* LỖI ĐÃ SỬA: Xóa p/> không hợp lệ */}
+        <button className="block mx-auto bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600">
+          Chỉ đường
+        </button>
+        <p className="text-xs text-gray-500 mt-2">Tích hợp Google Maps Directions API</p>
               </div>
             </div>
           </div>
@@ -590,213 +570,16 @@ const ToolsPage = () => {
   );
 };
 
-// Explore Page (Giữ nguyên)
-const ExplorePage = () => {
-  const [destinations, setDestinations] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [searchTerm, setSearchTerm] = useState('');
 
-  useEffect(() => {
-    loadDestinations();
-  }, []);
+// *** ĐÃ XÓA: ExplorePage và DestinationCard (đã chuyển sang file ExplorePage.js) ***
 
-  const loadDestinations = async () => {
-    setLoading(true);
-    try {
-      // *** THAY ĐỔI LỚN: Gọi API mới từ Database (top-rated-places) ***
-      const response = await axios.get('http://127.0.0.1:5000/api/top-rated-places');
-      
-      // Response.data đã được format sẵn trong app.py
-      setDestinations(response.data || []);
 
-    } catch (error) {
-      console.error('Lỗi load điểm đến từ DB:', error);
-      // Fallback data
-      setDestinations([
-        {
-          name: 'Lỗi Kết Nối DB',
-          description: 'Không thể tải dữ liệu. Vui lòng kiểm tra Flask Server và kết nối DB.',
-          image: 'https://via.placeholder.com/800x400?text=Database+Error',
-          rating: 0.0,
-          category: 'lỗi',
-          vr360: 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Halong_Bay_Vietnam_360_main_cav.jpg'
-        }
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const filteredDests = destinations.filter(d => 
-    d.name.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
-  return (
-    <div className="pt-24 pb-12 min-h-screen bg-gray-50">
-      <div className="container mx-auto px-4">
-        <h1 className="text-4xl font-bold mb-4 text-gray-800">🗺️ Khám phá điểm đến (Top Rate)</h1>
-        <p className="text-gray-600 mb-8">Danh sách 6 điểm đến được đánh giá cao nhất từ cơ sở dữ liệu</p>
-
-        {/* Search */}
-        <div className="bg-white rounded-xl shadow-lg p-4 mb-8">
-          <div className="relative">
-            <Search className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Tìm kiếm điểm đến..."
-              className="w-full pl-10 pr-4 py-3 border rounded-lg outline-none focus:ring-2 focus:ring-cyan-500"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </div>
-        </div>
-
-        {loading ? (
-          <div className="text-center py-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-500 mx-auto"></div>
-            <p className="text-gray-600 mt-4">💾 Đang tải dữ liệu từ Database...</p>
-          </div>
-        ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {filteredDests.map((dest, idx) => (
-              // Lưu ý: dest.rating giờ là rating trung bình từ DB
-              <DestinationCard key={idx} destination={dest} />
-            ))}
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Destination Card Component (Giữ nguyên)
-const DestinationCard = ({ destination }) => {
-  // ... (Toàn bộ code của DestinationCard giữ nguyên như file gốc) ...
-  const [showVR, setShowVR] = useState(false);
-  const [aiDescription, setAiDescription] = useState('');
-  const [loadingDesc, setLoadingDesc] = useState(false);
-
-  const loadAIDescription = async () => {
-    setLoadingDesc(true);
-    try {
-      const response = await axios.post('http://127.0.0.1:5000/api/chat',
-        new URLSearchParams({
-          message: `Viết thuyết minh chi tiết về ${destination.name} bằng tiếng Việt (3-4 câu). Chỉ trả về nội dung thuyết minh.`
-        })
-      );
-      setAiDescription(response.data.reply);
-    } catch (error) {
-      setAiDescription('Không thể tải thuyết minh.');
-    } finally {
-      setLoadingDesc(false);
-    }
-  };
-
-  const speakDescription = (text, lang) => {
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.lang = lang;
-    window.speechSynthesis.speak(utterance);
-  };
-
-  return (
-    <div className="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-2xl transition">
-      <img src={destination.image} alt={destination.name} className="w-full h-48 object-cover" />
-      <div className="p-6">
-        <div className="flex justify-between items-start mb-2">
-          <h3 className="text-xl font-bold">{destination.name}</h3>
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 text-yellow-500 fill-current" />
-            <span className="text-sm font-semibold">{destination.rating}</span>
-          </div>
-        </div>
-        <p className="text-gray-600 text-sm mb-4">{destination.description}</p>
-        <span className="inline-block bg-cyan-100 text-cyan-700 px-3 py-1 rounded-full text-xs mb-4">
-          {destination.category}
-        </span>
-
-        <div className="space-y-2">
-          <button
-            onClick={() => setShowVR(!showVR)}
-            className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 text-white py-2 rounded-lg hover:shadow-lg transition flex items-center justify-center gap-2"
-          >
-            <Camera className="w-4 h-4" />
-            {showVR ? 'Đóng VR360' : 'Xem VR360'}
-          </button>
-
-          <button
-            onClick={loadAIDescription}
-            disabled={loadingDesc}
-            className="w-full bg-purple-500 text-white py-2 rounded-lg hover:bg-purple-600 transition text-sm disabled:opacity-50"
-          >
-            {loadingDesc ? '🤖 Đang tải...' : '🎙️ Thuyết minh AI'}
-          </button>
-        </div>
-
-        {/* VR360 Modal */}
-        {showVR && (
-          <div className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
-            <div className="bg-white rounded-xl max-w-4xl w-full overflow-hidden">
-              <div className="p-4 border-b flex justify-between items-center">
-                <h3 className="font-bold text-lg">{destination.name} - VR360</h3>
-                <button onClick={() => setShowVR(false)} className="text-gray-500 hover:text-gray-700">
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              <div className="aspect-video bg-black">
-                {/* Đảm bảo crossOrigin="anonymous" nếu ảnh từ domain khác */}
-                <a-scene embedded>
-                  <a-sky src={destination.vr360} crossOrigin="anonymous"></a-sky>
-                  <a-camera position="0 0 0.1"></a-camera>
-                </a-scene>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* AI Description */}
-        {aiDescription && (
-          <div className="mt-4 p-4 bg-purple-50 rounded-lg">
-            <div className="flex justify-between items-start mb-2">
-              <p className="text-sm font-semibold text-purple-700">Thuyết minh AI</p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => speakDescription(aiDescription, 'vi-VN')}
-                  className="text-purple-600 hover:text-purple-700"
-                  title="Nghe tiếng Việt"
-                >
-                  🇻🇳 <Play className="w-4 h-4 inline" />
-                </button>
-                <button
-                  onClick={async () => {
-                    const res = await axios.post('http://127.0.0.1:5000/api/chat',
-                      new URLSearchParams({
-                        message: `Translate to English: "${aiDescription}". Only return translation.`
-                      })
-                    );
-                    speakDescription(res.data.reply, 'en-US');
-                  }}
-                  className="text-blue-600 hover:text-blue-700"
-                  title="Nghe tiếng Anh"
-                >
-                  🇬🇧 <Play className="w-4 h-4 inline" />
-                </button>
-              </div>
-            </div>
-            <p className="text-sm text-gray-700">{aiDescription}</p>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-// Map Page (Giữ nguyên)
+// Map Page
 const MapPage = () => {
-  // ... (Toàn bộ code của MapPage giữ nguyên như file gốc) ...
+  // ... (Toàn bộ code của MapPage giữ nguyên) ...
   const [currentWeather, setCurrentWeather] = useState(null);
-  const [userLocation, setUserLocation] = useState(null); // { lat: number, lng: number }
+  const [userLocation, setUserLocation] = useState(null);
   const WEATHER_API_KEY = 'bdb6cd644053354271d07e32ba89b83'; 
-
 
   useEffect(() => {
     getUserLocationWeather();
@@ -807,12 +590,9 @@ const MapPage = () => {
       navigator.geolocation.getCurrentPosition(async (position) => {
         const { latitude, longitude } = position.coords;
         setUserLocation({ lat: latitude, lng: longitude });
-
-        // Fetch weather
         const weatherRes = await axios.get(
           `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}&units=metric&lang=vi`
         );
-
         setCurrentWeather({
           temp: Math.round(weatherRes.data.main.temp),
           description: weatherRes.data.weather[0].description,
@@ -823,17 +603,11 @@ const MapPage = () => {
         });
       }, (error) => {
         console.error('Lỗi lấy vị trí:', error);
-        // Fallback Hồ Chí Minh
         const fallbackLocation = { lat: 10.8231, lng: 106.6297 };
         setUserLocation(fallbackLocation);
-        
         setCurrentWeather({
-          temp: 32,
-          description: 'nắng đẹp',
-          icon: '01d',
-          humidity: 65,
-          wind: 12,
-          city: 'Hồ Chí Minh'
+          temp: 32, description: 'nắng đẹp', icon: '01d',
+          humidity: 65, wind: 12, city: 'Hồ Chí Minh'
         });
       });
     } catch (error) {
@@ -885,7 +659,6 @@ const MapPage = () => {
           <div className="p-4 border-b">
             <h3 className="font-bold text-lg">Bản đồ vị trí (React Leaflet)</h3>
           </div>
-          
           {userLocation ? (
             <MapContainer 
               center={[userLocation.lat, userLocation.lng]} 
@@ -946,17 +719,15 @@ const MapPage = () => {
 };
 
 
-// *** THÊM MỚI: Trang chi tiết địa điểm (Destination Detail Page) ***
+// Trang chi tiết địa điểm (Destination Detail Page)
 const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
   const [placeData, setPlaceData] = useState(null);
   const [relatedPlaces, setRelatedPlaces] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [showVR, setShowVR] = useState(false);
-
-  // State cho dự đoán chi phí
   const [days, setDays] = useState(3);
-  const [people, setPeople] = useState(2); // Thêm state số người
+  const [people, setPeople] = useState(2); 
   const [costPrediction, setCostPrediction] = useState(null);
   const [loadingCost, setLoadingCost] = useState(false);
 
@@ -976,7 +747,6 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
         setLoading(false);
       }
     };
-
     const fetchRelated = async () => {
        try {
         const response = await axios.get(`http://127.0.0.1:5000/api/related-places`);
@@ -985,15 +755,13 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
         console.error('Lỗi tải địa điểm liên quan:', err);
       }
     }
-
     fetchDetails();
     fetchRelated();
   }, [placeId]);
 
-  // Hàm dự đoán chi phí (Copy từ ToolsPage và chỉnh sửa)
+  // Hàm dự đoán chi phí
   const handleCostPrediction = async () => {
     if (!placeData?.details?.name) return;
-    
     setLoadingCost(true);
     try {
       const response = await axios.post('http://127.0.0.1:5000/api/chat',
@@ -1001,7 +769,6 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
           message: `Ước tính chi phí du lịch ${placeData.details.name} cho ${people} người trong ${days} ngày. Bao gồm: vé máy bay/di chuyển, khách sạn, ăn uống, vé tham quan. Trả về JSON: {"transport": số, "hotel": số, "food": số, "tickets": số, "total": số}. Chỉ trả JSON, không giải thích.`
         })
       );
-      
       const jsonMatch = response.data.reply.match(/\{[\s\S]*\}/);
       if (jsonMatch) {
         const costs = JSON.parse(jsonMatch[0]);
@@ -1029,9 +796,6 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
     return <div className="flex">{stars}</div>;
   };
 
-  // Lấy ảnh 360 (Giả sử ảnh đầu tiên là 360, hoặc bạn có thể thêm 1 trường
-  // 'is_360' vào bảng Images trong DB)
-  // Tạm thời, chúng ta sẽ dùng ảnh từ DB (nếu có) hoặc 1 ảnh mẫu
   const vrImageUrl = placeData?.images?.[0]?.image_url || 'https://upload.wikimedia.org/wikipedia/commons/f/f0/Halong_Bay_Vietnam_360_main_cav.jpg';
 
   if (loading) {
@@ -1107,13 +871,12 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
               </p>
             </div>
 
-            {/* Dự đoán chi phí (Theo yêu cầu) */}
+            {/* Dự đoán chi phí */}
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
                 <DollarSign className="w-8 h-8 text-blue-500" />
                 Dự đoán chi phí (AI)
               </h2>
-              
               <div className="grid md:grid-cols-2 gap-4 mb-6">
                 <div>
                   <label className="block text-sm font-semibold mb-2">Số ngày: {days}</label>
@@ -1127,7 +890,6 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
                   />
                 </div>
                 <div>
-                  {/* *** THÊM MỚI: Input số người *** */}
                   <label className="block text-sm font-semibold mb-2">Số người: {people}</label>
                   <input
                     type="range"
@@ -1139,7 +901,6 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
                   />
                 </div>
               </div>
-
               <button
                 onClick={handleCostPrediction}
                 disabled={loadingCost}
@@ -1147,7 +908,6 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
               >
                 {loadingCost ? '🤖 AI đang tính...' : `🤖 Ước tính cho ${people} người, ${days} ngày`}
               </button>
-
               {costPrediction && (
                 <div className="mt-6 grid md:grid-cols-2 gap-4">
                   <div className="space-y-3">
@@ -1214,7 +974,7 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
                 center={[details.lat, details.lng]}
                 zoom={14}
                 style={{ height: '300px', width: '100%' }}
-                scrollWheelZoom={false} // Tắt zoom cuộn chuột
+                scrollWheelZoom={false} 
               >
                 <TileLayer
                   url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -1229,7 +989,7 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
             <div className="bg-white rounded-xl shadow-lg p-6">
                <h3 className="font-bold text-lg mb-4">Album ảnh</h3>
                <div className="grid grid-cols-2 gap-4">
-                {images.map((img) => (
+                {images.length > 0 ? images.map((img) => (
                   <img 
                     key={img.id}
                     src={img.image_url}
@@ -1237,7 +997,7 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
                     className="w-full h-32 object-cover rounded-lg shadow-sm cursor-pointer hover:opacity-80 transition"
                     title={img.description}
                   />
-                ))}
+                )) : <p className="text-sm text-gray-500 col-span-2">Chưa có ảnh cho địa điểm này.</p>}
                </div>
             </div>
 
@@ -1246,15 +1006,21 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
                <h3 className="font-bold text-lg mb-4">Gợi ý liên quan</h3>
                <div className="space-y-4">
                 {relatedPlaces
-                  .filter(p => p.id !== placeId) // Loại địa điểm hiện tại
+                  .filter(p => p.id !== placeId) 
                   .map((place) => (
                   <div 
                     key={place.id}
                     className="flex gap-4 p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition"
-                    // Chuyển sang địa điểm liên quan khi click
-                    onClick={() => window.location.href = `?place=${place.id}`} // Tạm thời reload, hoặc tốt hơn là setPlaceId(place.id)
+                    onClick={() => {
+                      // Cập nhật URL và state mà không reload trang
+                      window.history.pushState({}, '', `?place=${place.id}`);
+                      // (Trong App.js, hàm setSelectedPlaceId sẽ được gọi để trigger load lại data)
+                      // Tuy nhiên, logic hiện tại của App.js không truyền setSelectedPlaceId vào đây
+                      // Cách đơn giản nhất là reload:
+                      window.location.href = `?place=${place.id}`;
+                    }}
                   >
-                    <img src={place.thumbnail} alt={place.name} className="w-20 h-20 object-cover rounded-md" />
+                    <img src={place.thumbnail || 'https://via.placeholder.com/100x100'} alt={place.name} className="w-20 h-20 object-cover rounded-md" />
                     <div>
                       <h4 className="font-bold text-cyan-700">{place.name}</h4>
                       <p className="text-xs text-gray-600 line-clamp-2">{place.description}</p>
@@ -1269,7 +1035,7 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
         </div>
       </div>
 
-      {/* VR360 Modal (Giống ExplorePage) */}
+      {/* VR360 Modal */}
       {showVR && (
         <div className="fixed inset-0 bg-black/80 z-[100] flex items-center justify-center p-4">
           <div className="bg-white rounded-xl max-w-4xl w-full overflow-hidden">
@@ -1295,9 +1061,9 @@ const DestinationDetailPage = ({ placeId, setCurrentPage }) => {
 
 
 
-// AI ChatBox (Giữ nguyên)
+// AI ChatBox
 function ChatBox() {
-  // ... (Toàn bộ code của ChatBox giữ nguyên như file gốc) ...
+  // ... (Toàn bộ code của ChatBox giữ nguyên) ...
   const [message, setMessage] = useState("");
   const [chat, setChat] = useState([]);
   const [image, setImage] = useState(null);
@@ -1324,13 +1090,10 @@ function ChatBox() {
 
   const handleSend = async () => {
     if (!message.trim() && !image) return;
-
     const formData = new FormData();
     if (message.trim()) formData.append("message", message.trim());
     if (image) formData.append("image", image);
-
     setChat((prev) => [...prev, { user: "me", text: message.trim(), img: preview }]);
-    
     setMessage("");
     setImage(null);
     setPreview(null);
@@ -1338,7 +1101,6 @@ function ChatBox() {
       fileInputRef.current.value = "";
     }
     setLoading(true);
-
     try {
       const res = await axios.post("http://127.0.0.1:5000/api/chat", formData);
       setChat((prev) => [...prev, { user: "ai", text: res.data.reply }]);
@@ -1365,7 +1127,6 @@ function ChatBox() {
       <div className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white p-4 rounded-t-xl text-center font-bold text-lg">
         🤖 AI Trợ lý (Gemini)
       </div>
-
       <div className="flex-1 overflow-y-auto p-4 space-y-4" style={{ scrollbarWidth: 'thin', scrollbarColor: '#4f46e5 #2d3748' }}>
         {chat.length === 0 ? (
           <div className="text-center mt-8">
@@ -1391,7 +1152,6 @@ function ChatBox() {
         )}
         <div ref={chatEndRef} />
       </div>
-
       <div className="p-4 border-t border-gray-700 bg-gray-800 rounded-b-xl">
         {preview && (
           <div className="mb-2 relative w-24 h-24 rounded-lg overflow-hidden border-2 border-cyan-500">
@@ -1413,12 +1173,10 @@ function ChatBox() {
             placeholder="Hỏi AI về du lịch..."
             className="flex-1 p-3 rounded-lg bg-gray-700 text-white placeholder-gray-400 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-cyan-500"
           />
-          
           <input type="file" accept="image/*" ref={fileInputRef} onChange={handleImageChange} className="hidden" />
           <button onClick={() => fileInputRef.current.click()} className="p-3 bg-gray-700 text-gray-300 rounded-lg hover:bg-gray-600 transition">
             <Paperclip className="w-5 h-5" />
           </button>
-
           <button
             onClick={handleSend}
             disabled={loading || (!message.trim() && !image)}
@@ -1434,7 +1192,7 @@ function ChatBox() {
   );
 }
 
-// Footer (Giữ nguyên)
+// Footer
 const Footer = ({ setCurrentPage }) => (
   <footer className="bg-gray-800 text-white py-12">
     <div className="container mx-auto px-4">
@@ -1448,7 +1206,6 @@ const Footer = ({ setCurrentPage }) => (
             Nền tảng du lịch thông minh với AI & APIs
           </p>
         </div>
-        
         <div>
           <h3 className="font-bold mb-4">Tính năng AI</h3>
           <ul className="space-y-2 text-sm text-gray-400">
@@ -1458,7 +1215,6 @@ const Footer = ({ setCurrentPage }) => (
             <li>🗣️ Phiên dịch & Lồng tiếng</li>
           </ul>
         </div>
-        
         <div>
           <h3 className="font-bold mb-4">Bản đồ & APIs</h3>
           <ul className="space-y-2 text-sm text-gray-400">
@@ -1468,7 +1224,6 @@ const Footer = ({ setCurrentPage }) => (
             <li>🌍 Gemini API (Flask)</li>
           </ul>
         </div>
-        
         <div>
           <h3 className="font-bold mb-4">API Keys</h3>
           <p className="text-xs text-gray-500 mb-2">Cần cấu hình:</p>
@@ -1479,7 +1234,6 @@ const Footer = ({ setCurrentPage }) => (
           </ul>
         </div>
       </div>
-      
       <div className="border-t border-gray-700 mt-8 pt-8 text-center text-sm text-gray-400">
         <p>© 2025 Smart Travel Hub - Powered by AI & APIs</p>
       </div>
@@ -1488,14 +1242,14 @@ const Footer = ({ setCurrentPage }) => (
 );
 
 // Main App
-// *** CẬP NHẬT: Thêm 'selectedPlaceId' và route cho trang 'details' ***
+// *** CẬP NHẬT: Xử lý URL (F5) cho trang chi tiết ***
 const App = () => {
   const [currentPage, setCurrentPage] = useState('home');
   const [selectedPlaceId, setSelectedPlaceId] = useState(null); // ID của địa điểm đang xem
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isChatOpen, setIsChatOpen] = useState(false);
 
-  // *** THÊM MỚI: Xử lý nếu URL có query ?place=... (để F5 trang chi tiết) ***
+  // Xử lý nếu URL có query ?place=... (để F5 trang chi tiết)
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const placeIdFromUrl = urlParams.get('place');
@@ -1505,13 +1259,13 @@ const App = () => {
     }
   }, []);
 
-  // *** THÊM MỚI: Cập nhật URL khi chuyển trang chi tiết ***
+  // Cập nhật URL khi chuyển trang chi tiết
   useEffect(() => {
     const url = new URL(window.location.href);
     if (currentPage === 'details' && selectedPlaceId) {
       url.searchParams.set('place', selectedPlaceId);
       window.history.pushState({}, '', url);
-    } else {
+    } else if (currentPage === 'home') { // Xóa query khi về home
       url.searchParams.delete('place');
       window.history.pushState({}, '', url);
     }
@@ -1532,7 +1286,13 @@ const App = () => {
                                     setCurrentPage={setCurrentPage} 
                                     setSelectedPlaceId={setSelectedPlaceId} 
                                   />}
-      {currentPage === 'explore' && <ExplorePage />}
+      
+      {/* *** CẬP NHẬT: Truyền props cho ExplorePage *** */}
+      {currentPage === 'explore' && <ExplorePage 
+                                      setCurrentPage={setCurrentPage}
+                                      setSelectedPlaceId={setSelectedPlaceId}
+                                    />}
+      
       {currentPage === 'tools' && <ToolsPage />}
       {currentPage === 'map' && <MapPage />}
       {currentPage === 'details' && <DestinationDetailPage 
