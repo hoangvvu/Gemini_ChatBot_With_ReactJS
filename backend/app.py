@@ -5,9 +5,9 @@ from dotenv import load_dotenv
 from flask import Flask, send_from_directory
 import os
 import pyodbc
-import re  # 👈 THÊM MỚI: Để xử lý JSON từ AI
-import json # 👈 THÊM MỚI: Để xử lý JSON từ AI
-from auth import auth_bp   # 👈 import blueprint từ file trên
+import re  
+import json
+from auth import auth_bp  
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
@@ -30,7 +30,7 @@ CORS(app, resources={
 # --- CẤU HÌNH GEMINI AI ---
 API_KEY = os.getenv("GEMINI_API_KEY")
 if not API_KEY:
-    print("⚠️ Thiếu GEMINI_API_KEY trong file .env. Các tính năng AI sẽ không hoạt động.")
+    print("Thiếu GEMINI_API_KEY trong file .env. Các tính năng AI sẽ không hoạt động.")
 client = genai.Client(api_key=API_KEY)
 
 
